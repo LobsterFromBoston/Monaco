@@ -53,6 +53,7 @@
         ClearText = function()
         {
           editor.setValue("");
+          localStorage.removeItem("editorContent");
         }
 
         SetTheme = function(th)
@@ -60,9 +61,20 @@
           editor.setTheme("ace/theme/" + th);
         }
 
+        // Load content from localStorage if it exists
+        window.onload = function() {
+            var cachedContent = localStorage.getItem("editorContent");
+            if (cachedContent) {
+                editor.setValue(cachedContent);
+            }
+        };
+
         editor.on("input", async function() 
         {
           await CefSharp.BindObjectAsync("synServiceAsync");
+
+          // Save content to localStorage as the user types
+          localStorage.setItem("editorContent", editor.getValue());
 
           synServiceAsync.textChanged(editor.getValue());
         });
